@@ -755,3 +755,66 @@ function testFunc()
 	for n in pairs(_G) do print(n,_G[n]) end
 
  end
+
+
+function tableMin(tab)
+
+	local firstPass = true
+	local minVal
+	local minKey
+
+	for i, element in pairs(tab) do
+
+		if (firstPass) then
+
+			minKey = i
+			minVal = element
+			firstPass = false
+
+		else
+
+		 	if (element < minVal) then
+
+		 		minKey = i
+		 		minVal = element
+
+		 	 end
+
+		 end
+
+	 end
+
+	 return minVal,minKey
+
+ end
+
+function tableMax(tab)
+
+	local firstPass = true
+	local maxVal
+	local maxKey
+
+	for i, element in pairs(tab) do
+
+		if (firstPass) then
+
+			maxKey = i
+			maxVal = element
+			firstPass = false
+
+		else
+
+		 	if (element > maxVal) then
+
+		 		maxKey = i
+		 		maxVal = element
+
+		 	 end
+
+		 end
+
+	 end
+
+	 return maxVal,maxKey
+
+ end

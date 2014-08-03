@@ -27,6 +27,8 @@ function love.load()
 				inFields={}, 
 				isAnchor = false, 
 				anchorLevel = 0,
+				tipAccess = false,
+
 			 }
 	function Portal:new(o)
 
@@ -50,6 +52,7 @@ function love.load()
 				containsPortals = {}, 
 				level = 0, 
 				area = 0,
+				fieldType = "unassigned",
 			 }
 	function Field:new(o)
 
@@ -158,7 +161,13 @@ function love.draw()
 				lg.setColor(HEXtoDEC("00"),HEXtoDEC("7b"),HEXtoDEC("a7"),200*(1/10))
 				pointPolygon("fill",field.anchorPortals)
 
-				lg.setColor(HEXtoDEC("00"),HEXtoDEC("7b"),HEXtoDEC("a7"),255)
+				if (field.fieldType == "tail") then
+					lg.setColor(255,0,0,255)
+				elseif (field.fieldType == "wing") then
+					lg.setColor(0,255,0)
+				else
+					lg.setColor(HEXtoDEC("00"),HEXtoDEC("7b"),HEXtoDEC("a7"),255)
+				end
 				pointPolygon("line",field.anchorPortals)
 
 			 end
@@ -209,7 +218,7 @@ function love.update(dt)
 		closestPortalID = findClosestPoint(mouse,portals)
 		closestPortal = closestPortalID[1][closestPortalID[2]]
 		currentField = closestPortal.inFields[#closestPortal.inFields]
-		--print(closestPortal.id)
+		print(closestPortal.tipAccess,closestPortal.anchorLevel)
 	end
 
 	--print(mode)
@@ -255,11 +264,18 @@ function love.mousepressed( x, y, button )
 
 				closestPortal.isAnchor = true
 				closestPortal.anchorLevel = 1
+
+				if (totalAnchors == 0) then
+					closestPortal.tipAccess = true
+				else
+					closestPortal.tipAccess = false
+				end
+
 				totalAnchors = totalAnchors+1
 
 				if (totalAnchors == 3) then
 
-					table.insert(fields,Field:new{level = 1})
+					table.insert(fields,Field:new{level = 1, fieldType = "main"})
 
 					for i, portal in pairs(portals) do
 
@@ -299,25 +315,61 @@ function love.mousepressed( x, y, button )
 
 				closestPortal.isAnchor = true
 				closestPortal.anchorLevel = currentField.level+1
+				closestPortal.tipAccess = true
 				totalAnchors = totalAnchors+1
 
-				table.insert(fields,Field:new{level = closestPortal.anchorLevel})
+				
+				--determine which anchor portal is "tip" for assigning field types of wing/tail
+				local possibleTipPortals = {}
+
+				for i, portal in pairs(currentField.anchorPortals) do
+
+					if (portal.tipAccess) then
+
+						possibleTipPortals[i] = portal.anchorLevel
+
+					 end
+
+				 end
+
+				local limit, key
+				if(currentField.fieldType == "tail") then
+					limit, key = tableMax(possibleTipPortals)
+				else
+					limit, key = tableMin(possibleTipPortals)
+				end
+
+				
+				local tipPortal = key
+				local sidePortals = {}
+
+				for i, portal in pairs(currentField.anchorPortals) do
+					if (i ~= key) then
+						table.insert(sidePortals,i)
+					end
+				 end
+				--
+
+				print(tipPortal,sidePortals[1],sidePortals[2])
+
+
+				table.insert(fields,Field:new{level = closestPortal.anchorLevel, fieldType = "wing"})
 				table.insert(fields[#fields].anchorPortals,closestPortal)
-				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[1])
-				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[2])
+				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[tipPortal])
+				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[1]])
 				fields[#fields]:setPortalsInside()
 
 
-				table.insert(fields,Field:new{level = closestPortal.anchorLevel})
+				table.insert(fields,Field:new{level = closestPortal.anchorLevel, fieldType = "wing"})
 				table.insert(fields[#fields].anchorPortals,closestPortal)
-				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[2])
-				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[3])
+				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[tipPortal])
+				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[2]])
 				fields[#fields]:setPortalsInside()
 
-				table.insert(fields,Field:new{level = closestPortal.anchorLevel})
+				table.insert(fields,Field:new{level = closestPortal.anchorLevel, fieldType = "tail"})
 				table.insert(fields[#fields].anchorPortals,closestPortal)
-				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[1])
-				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[3])
+				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[1]])
+				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[2]])
 				fields[#fields]:setPortalsInside()
 
 				if (totalAnchors == totalPortals) then
