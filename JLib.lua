@@ -818,3 +818,104 @@ function tableMax(tab)
 	 return maxVal,maxKey
 
  end
+
+--takes a table of objects and sorts them based on certain field
+--sorts lowest to highest
+function objectTableSort(tab,field)
+
+	if (type(field) ~= "string") then
+
+		error("Field passed to objectTableSort was not a string.")
+
+	 end
+
+	for i, Obj1 in pairs(tab) do
+
+		for j, Obj2 in pairs(tab) do
+
+			if (tab[j][field]>tab[i][field]) then
+
+				tab[i], tab[j] = tab[j], tab[i]
+				--print("swapped "..Obj2.id.." with "..Obj1.id)
+
+			 end
+
+		 end
+
+	 end
+
+ end
+
+
+
+
+--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

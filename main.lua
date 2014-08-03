@@ -86,8 +86,33 @@ function love.load()
 	 end
 	totalFields = 0
 	
+	--definition of link object
+	--[[TODO: Define links
+			  -add links{} field to Field objects (and Portal objects?)
+	]]
+
+	Link = {
+				id = 0,
+				ends = {},
+				isMade = false,
+			 }
+	function Link:new(o)
+
+		totalLinks = totalLinks+1
+
+		o = o or {}
+		setmetatable(o,self)
+		self.__index = self
+		o.id = #links+1
+		objectTableSort(self.ends,"id")
+		return o
+
+	 end 
+	totalLinks = 0
+
 	portals = {}
 	fields = {}
+	links = {}
 
 	mode = "place"
 	
@@ -99,6 +124,7 @@ function love.draw()
 		lg.scale(1,-1)
 		lg.translate(window.width/2,-window.height/2)
 		lg.setLineJoin("none")
+		lg.setLineWidth(1)
 
 		if (mode == "place") then
 
@@ -204,7 +230,59 @@ function love.draw()
 
 		 end
 
+		if (mode == "link") then
 
+			setHexColor(white)
+			
+			for i, field in pairs(fields) do
+
+				lg.setColor(HEXtoDEC("00"),HEXtoDEC("7b"),HEXtoDEC("a7"),200*(1/10))
+				pointPolygon("fill",field.anchorPortals)
+
+				if (field.fieldType == "tail") then
+
+					lg.setColor(255,0,0,255)
+
+				elseif (field.fieldType == "wing") then
+
+					lg.setColor(0,255,0)
+
+				else
+
+					lg.setColor(HEXtoDEC("00"),HEXtoDEC("7b"),HEXtoDEC("a7"),255)
+
+				end
+
+				pointPolygon("line",field.anchorPortals)
+
+			end
+
+
+			setHexColor(cerulean)
+			for i, portal in pairs(portals) do
+
+				lg.circle("fill",portal.x,portal.y,3)
+
+			end
+
+
+			for i, link in pairs(links) do
+
+				if (link.isMade) then
+					
+					setHexColor(cerulean)
+					lg.setLineWidth(3)
+					pointLine({{x=link.ends[1].x,y=link.ends[1].y}},{{x=link.ends[2].x,y=link.ends[2].y}})
+					
+				end
+
+			end
+
+
+
+		end
+
+		
 		drawButtons()
 	
 	 lg.pop()
@@ -218,7 +296,7 @@ function love.update(dt)
 		closestPortalID = findClosestPoint(mouse,portals)
 		closestPortal = closestPortalID[1][closestPortalID[2]]
 		currentField = closestPortal.inFields[#closestPortal.inFields]
-		print(closestPortal.tipAccess,closestPortal.anchorLevel)
+		--print(closestPortal.tipAccess,closestPortal.anchorLevel)
 	end
 
 	--print(mode)
@@ -230,16 +308,57 @@ function love.focus(bool)
  end
 
 function love.keypressed( key, unicode )
+	
 	if key == "`" then
 		debug.debug()
 	end
-	if key == "/" then
-		testFunc()
+	
+	if (mode == "place") then
+
+		if key == "/" then
+			testFunc()
+		end
+
+		if key == "return" then
+			mode = "mainAnchor"
+			print("Select 3 main outside portals")
+		end
+
 	end
-	if key == "return" then
-		mode = "mainAnchor"
-		print("Select 3 main outside portals")
+
+
+	if (mode == "mainAnchor") then
+
+		--
+
 	end
+
+	if (mode == "field") then
+
+		--
+
+	end
+
+	if (mode == "link") then
+
+		if key == "return" then
+
+			--
+
+		end
+
+	end
+
+	if (mode == "temp") then
+
+		if key == "return" then
+
+			--
+
+		end
+
+	end
+
  end
 
 function love.keyreleased( key, unicode )
@@ -288,6 +407,11 @@ function love.mousepressed( x, y, button )
 					 end
 
 					fields[1]:setPortalsInside()
+
+					table.insert(links,Link:new{ends = {fields[1].anchorPortals[1],fields[1].anchorPortals[2]} })
+					table.insert(links,Link:new{ends = {fields[1].anchorPortals[2],fields[1].anchorPortals[3]} })
+					table.insert(links,Link:new{ends = {fields[1].anchorPortals[1],fields[1].anchorPortals[3]} })
+
 					mode = "field"
 				 
 				 end
@@ -358,6 +482,7 @@ function love.mousepressed( x, y, button )
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[tipPortal])
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[1]])
 				fields[#fields]:setPortalsInside()
+				table.insert(links,Link:new{ends = {currentField.anchorPortals[tipPortal],currentField.anchorPortals[sidePortals[1]]} })
 
 
 				table.insert(fields,Field:new{level = closestPortal.anchorLevel, fieldType = "wing"})
@@ -365,16 +490,19 @@ function love.mousepressed( x, y, button )
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[tipPortal])
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[2]])
 				fields[#fields]:setPortalsInside()
+				table.insert(links,Link:new{ends = {currentField.anchorPortals[tipPortal],currentField.anchorPortals[sidePortals[2]]} })
 
 				table.insert(fields,Field:new{level = closestPortal.anchorLevel, fieldType = "tail"})
 				table.insert(fields[#fields].anchorPortals,closestPortal)
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[1]])
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[2]])
 				fields[#fields]:setPortalsInside()
+				table.insert(links,Link:new{ends = {currentField.anchorPortals[sidePortals[1]],currentField.anchorPortals[sidePortals[2]]} })
 
 				if (totalAnchors == totalPortals) then
 
 					print("All fields linked.")
+					mode = "link"
 
 				 end
 
@@ -392,6 +520,22 @@ function love.mousepressed( x, y, button )
 
 	 end
 	
+	if (mode == "link") then
+
+		if button == "l" then
+			links[1].isMade = true
+		 end
+
+		if button == "r" then
+			
+		 end
+
+		if button == "m" then
+			
+		 end
+
+	 end
+
 	if (mode == "temp") then
 
 		if button == "l" then
