@@ -1,35 +1,27 @@
 function love.load()
 	--[[TODO:
 	
-		--Create portal object with fields:
-			x
-			y
-			title
-			inFields
-			isAnchor (t/f)
-		--Create field object with fields:
-			anchorPortals
-			containsPortals
-			level
-			area
+		--ADD PARENT FIELD TO EACH FIELD
+		--ADD isParent trait to Field object
 
 		]]
-
+	exit=false
 	require "JLib"
 	
 	init()
 
-	--definition of portal object
+	--definition of Portal object
 	Portal = {
-				id = 0,
-				x=0, y=0, 
-				title="untitled portal", 
-				inFields={}, 
-				isAnchor = false, 
-				anchorLevel = 0,
-				tipAccess = false,
 
-			 }
+		id = 0,
+		x=0, y=0, 
+		title="untitled portal", 
+		inFields={}, 
+		isAnchor = false, 
+		anchorLevel = 0,
+		tipAccess = false,
+
+	 }
 	function Portal:new(o)
 
 		totalPortals = totalPortals+1
@@ -45,15 +37,25 @@ function love.load()
 	totalAnchors = 0
 	totalPortals = 0
 
-	--definition of field object
+	--definition of Field object
 	Field = {
-				id = 0,
-				anchorPortals = {}, 
-				containsPortals = {}, 
-				level = 0, 
-				area = 0,
-				fieldType = "unassigned",
-			 }
+
+		id = 0,
+		anchorPortals = {}, 
+		containsPortals = {}, 
+		level = 0, 
+		area = 0,
+		fieldType = "unassigned",
+		isParent = false,
+		tail = nil,
+		wing1 = nil,
+		wing2 = nil,
+		tailCompleted = false,
+		wing1Completed = false,
+		wing2Completed = false,
+		--links = {},
+
+	 }
 	function Field:new(o)
 
 		totalFields = totalFields+1
@@ -64,14 +66,17 @@ function love.load()
 		o.id = #fields+1
 		o.anchorPortals = {}
 		o.containsPortals = {}
+		o.links = {}
 		--o:setPortalsInside()
 		return o
 
 	 end
 	function Field:setPortalsInside()
+
 		for i, portal in pairs(portals) do
 
 			if(portal.anchorLevel ~= self.level) then
+
 				if (isInside(portal,self.anchorPortals)) then
 
 					table.insert(self.containsPortals,portal)
@@ -85,17 +90,16 @@ function love.load()
 
 	 end
 	totalFields = 0
-	
-	--definition of link object
-	--[[TODO: Define links
-			  -add links{} field to Field objects (and Portal objects?)
-	]]
 
+	--definition of Link object
 	Link = {
-				id = 0,
-				ends = {},
-				isMade = false,
-			 }
+
+		id = 0,
+		level = 0,
+		ends = {},
+		isMade = false,
+
+	 }
 	function Link:new(o)
 
 		totalLinks = totalLinks+1
@@ -109,13 +113,20 @@ function love.load()
 
 	 end 
 	totalLinks = 0
+	linksMade = 0
 
 	portals = {}
 	fields = {}
 	links = {}
 
+
 	mode = "place"
-	
+	--fieldQueue = {}
+	--linkQueue = {}
+	--priorityField = nil
+
+	temp = 0
+
  end
 
 function love.draw()
@@ -231,7 +242,7 @@ function love.draw()
 		 end
 
 		if (mode == "link") then
-
+			
 			setHexColor(white)
 			
 			for i, field in pairs(fields) do
@@ -253,7 +264,17 @@ function love.draw()
 
 				end
 
+				
+
 				pointPolygon("line",field.anchorPortals)
+
+				
+				if (field == priorityField) then
+
+					lg.setColor(255,0,0,255)
+					pointPolygon("fill",field.anchorPortals)
+
+				 end
 
 			end
 
@@ -268,15 +289,16 @@ function love.draw()
 
 			for i, link in pairs(links) do
 
-				if (link.isMade) then
-					
-					setHexColor(cerulean)
-					lg.setLineWidth(3)
-					pointLine({{x=link.ends[1].x,y=link.ends[1].y}},{{x=link.ends[2].x,y=link.ends[2].y}})
-					
-				end
+				setHexColor(white)
+				--lg.setLineWidth(3)
 
-			end
+				lg.push()
+				lg.translate( unpack(findMid( link.ends[1] , link.ends[2] )) )
+				lg.scale(1,-1)
+					lg.print( link.id, 0,0 )
+				lg.pop()
+
+			 end
 
 
 
@@ -292,12 +314,24 @@ function love.draw()
 function love.update(dt)
 	jupdate(dt)
 	
+	
 	if #portals >0 then
 		closestPortalID = findClosestPoint(mouse,portals)
 		closestPortal = closestPortalID[1][closestPortalID[2]]
 		currentField = closestPortal.inFields[#closestPortal.inFields]
 		--print(closestPortal.tipAccess,closestPortal.anchorLevel)
 	end
+
+	if (mode == "link" and not isCompleted(fields[1])) then
+			
+			
+			if (temp>0) then
+				print("makingLinks")
+				love.timer.sleep(2)
+				makeField(fields[1])
+			end
+			temp = temp + 1
+	 end
 
 	--print(mode)
 	
@@ -408,9 +442,9 @@ function love.mousepressed( x, y, button )
 
 					fields[1]:setPortalsInside()
 
-					table.insert(links,Link:new{ends = {fields[1].anchorPortals[1],fields[1].anchorPortals[2]} })
-					table.insert(links,Link:new{ends = {fields[1].anchorPortals[2],fields[1].anchorPortals[3]} })
-					table.insert(links,Link:new{ends = {fields[1].anchorPortals[1],fields[1].anchorPortals[3]} })
+					table.insert(links,Link:new{level = 1, ends = {fields[1].anchorPortals[1],fields[1].anchorPortals[2]} })
+					table.insert(links,Link:new{level = 1, ends = {fields[1].anchorPortals[2],fields[1].anchorPortals[3]} })
+					table.insert(links,Link:new{level = 1, ends = {fields[1].anchorPortals[1],fields[1].anchorPortals[3]} })
 
 					mode = "field"
 				 
@@ -474,34 +508,42 @@ function love.mousepressed( x, y, button )
 				 end
 				--
 
-				print(tipPortal,sidePortals[1],sidePortals[2])
-
+				currentField.isParent = true
 
 				table.insert(fields,Field:new{level = closestPortal.anchorLevel, fieldType = "wing"})
 				table.insert(fields[#fields].anchorPortals,closestPortal)
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[tipPortal])
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[1]])
 				fields[#fields]:setPortalsInside()
-				table.insert(links,Link:new{ends = {currentField.anchorPortals[tipPortal],currentField.anchorPortals[sidePortals[1]]} })
-
+				currentField.wing1 = fields[#fields]
 
 				table.insert(fields,Field:new{level = closestPortal.anchorLevel, fieldType = "wing"})
 				table.insert(fields[#fields].anchorPortals,closestPortal)
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[tipPortal])
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[2]])
 				fields[#fields]:setPortalsInside()
-				table.insert(links,Link:new{ends = {currentField.anchorPortals[tipPortal],currentField.anchorPortals[sidePortals[2]]} })
+				currentField.wing2 = fields[#fields]
 
 				table.insert(fields,Field:new{level = closestPortal.anchorLevel, fieldType = "tail"})
 				table.insert(fields[#fields].anchorPortals,closestPortal)
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[1]])
 				table.insert(fields[#fields].anchorPortals,currentField.anchorPortals[sidePortals[2]])
 				fields[#fields]:setPortalsInside()
-				table.insert(links,Link:new{ends = {currentField.anchorPortals[sidePortals[1]],currentField.anchorPortals[sidePortals[2]]} })
+				currentField.tail = fields[#fields]
+
+
+				table.insert(links,Link:new{level = currentField.level+1, ends = {closestPortal,currentField.anchorPortals[tipPortal]} })
+				table.insert(links,Link:new{level = currentField.level+1, ends = {closestPortal,currentField.anchorPortals[sidePortals[1]]} })
+				table.insert(links,Link:new{level = currentField.level+1, ends = {closestPortal,currentField.anchorPortals[sidePortals[2]]} })
+
 
 				if (totalAnchors == totalPortals) then
 
 					print("All fields linked.")
+					setFieldLinks()
+					--table.insert(fieldQueue,fields[1])
+					--setPriorityField()
+					--print("Field priority is now Field "..priorityField.id)
 					mode = "link"
 
 				 end
@@ -523,7 +565,7 @@ function love.mousepressed( x, y, button )
 	if (mode == "link") then
 
 		if button == "l" then
-			links[1].isMade = true
+
 		 end
 
 		if button == "r" then
@@ -597,5 +639,267 @@ function setButtons()
 	--createButton("Test Button C",nil,"circle",8,8,7)
 	--buttons[#buttons].color = cerulean
 	
+
+ end
+
+
+function makeField(field)
+
+	local wingTailsCompleted = false
+	 
+
+	while(not isCompleted(field)) do
+
+		if (not isCompleted(field.tail)) then
+
+			if (field.tail.isParent) then
+
+				makeField(field.tail)
+
+			 else
+
+			 	for i, link in pairs(field.tail.links) do
+
+					makeLink(link)
+
+				 end
+
+				field.tailCompleted = true
+
+			 end
+
+		elseif (not wingTailsCompleted) then
+
+			--print("making wing tails 1")
+
+			makeWingTails(field.wing1)
+
+			--print("making wing tails 2")
+
+			makeWingTails(field.wing2)
+
+			--print("wing tails completed")
+
+			wingTailsCompleted = true
+
+		elseif (not isCompleted(field)) then
+
+			makeJetLinks(field)
+
+			if (field == fields[1]) then
+
+				print("All links made.")
+
+			 end
+
+		else
+
+			print("found nothing to do")
+			love.timer.sleep(1)
+			exit = true
+
+	 	 end
+
+
+	 end
+
+	 exit = true
+
+
+ end
+
+
+function setFieldLinks()
+
+	for i, field in pairs(fields) do
+
+		for j, link in pairs(links) do
+
+			if (isInTable(link.ends[1],field.anchorPortals) and isInTable(link.ends[2],field.anchorPortals)) then
+
+				table.insert(field.links,link)
+
+			 end
+
+		 end
+
+	 end
+
+ end
+
+
+function isInTable(val,tab)
+
+	for i, element in pairs(tab) do
+
+		if (element == val) then
+
+			return true
+
+		 end
+
+	 end
+
+	return false
+
+ end
+
+function makeLink(link)
+
+	if (not link.isMade) then
+
+		link.isMade = true
+		print("made link "..link.id)
+
+	 else
+
+		--print("re-made link that was already made ".."(link "..link.id..")")
+
+	 end
+
+	 love.timer.sleep(0)
+
+	 
+
+  end
+
+
+function setPriorityField()
+
+	priorityField = fieldQueue[#fieldQueue]
+	print("new priority is Field "..priorityField.id)
+
+ end
+
+
+function makeWingTails(wing)
+
+
+	if (wing.isParent) then
+
+		if (wing.wing1.isParent) then
+			makeWingTails(wing.wing1)
+		end
+		if (wing.wing2.isParent) then
+			makeWingTails(wing.wing2)
+		end
+
+		if (wing.tail.isParent) then
+
+			makeField(wing.tail)
+
+		else
+
+			for i, link in pairs(wing.tail.links) do
+
+		 		makeLink(link)
+
+		 	 end
+
+	 	 wing.tailCompleted = true
+
+	 	end
+
+	 end
+
+
+ end
+
+
+function findMid(point1,point2)
+
+	--check to make sure points contain x and
+	local p1,p2
+
+	if (point1.x and point1.y) then
+
+		p1 = {x=point1.x, y=point1.y}
+
+	 else
+
+		error("point 1 is missing x and/or y")
+
+	 end
+
+	if (point2.x and point2.y) then
+
+		p2 = {x=point2.x, y=point2.y}
+
+	 else
+
+		error("point 2 is missing x and/or y")
+
+	 end
+
+	return {(p1.x+p2.x)/2, (p1.y+p2.y)/2}
+	
+
+ end
+
+
+function isCompleted(field)
+
+	for i, link in pairs(field.links) do
+
+		if (not link.isMade) then
+
+			return false
+
+		 end
+
+	 end
+
+	return true
+
+ end
+
+
+function makeJetLinks(field)
+
+	for i, link in pairs(field.wing1.links) do
+
+		if (not isInTable(link,field.wing2.links)) then
+				
+			makeLink(link)
+
+		 end
+
+	 end
+
+
+	for i, link in pairs(field.wing2.links) do
+
+		if (not isInTable(link,field.wing1.links)) then
+				
+			makeLink(link)
+
+		 end
+
+	 end
+
+
+	for i, link in pairs(field.wing1.links) do
+
+		if (isInTable(link,field.wing2.links)) then
+				
+			makeLink(link)
+
+		 end
+
+	 end
+
+
+	if (field.wing1.isParent) then
+
+		makeJetLinks(field.wing1)
+
+	 end
+
+	if (field.wing2.isParent) then
+
+		makeJetLinks(field.wing2)
+
+	 end
+
 
  end

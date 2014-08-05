@@ -4,6 +4,34 @@
 		"selected_items":
 		[
 			[
+				"field",
+				"field"
+			],
+			[
+				"tail",
+				"tailCompleted"
+			],
+			[
+				"wing1",
+				"wing1Completed"
+			],
+			[
+				"priority",
+				"priorityField"
+			],
+			[
+				"pri",
+				"priorityField"
+			],
+			[
+				"objec",
+				"objectTableSort"
+			],
+			[
+				"total",
+				"totalLinks"
+			],
+			[
 				"anchor",
 				"anchorPortals"
 			],
@@ -27,7 +55,7 @@
 			"file": "main.lua",
 			"settings":
 			{
-				"buffer_size": 11061,
+				"buffer_size": 14822,
 				"line_ending": "Windows"
 			}
 		}
@@ -84,6 +112,17 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"currentField",
+			"CurrentField",
+			"currentField",
+			"CurrentField",
+			"wing1",
+			"currentField",
+			"fieldPriority",
+			"currentField",
+			"print",
+			"priorityField",
+			"fieldPriority[#fieldPriority]",
 			"link",
 			"\"ctrl\\+k\"",
 			"\"ctrl\\+j,ctrl\"",
@@ -121,8 +160,8 @@
 						"selection":
 						[
 							[
-								1285,
-								1285
+								1191,
+								1191
 							]
 						],
 						"settings":
@@ -142,15 +181,15 @@
 					"file": "main.lua",
 					"settings":
 					{
-						"buffer_size": 11061,
+						"buffer_size": 14822,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5658,
-								5656
+								5603,
+								5603
 							]
 						],
 						"settings":
@@ -159,7 +198,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 336.0,
+						"translation.y": 63.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
