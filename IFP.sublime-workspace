@@ -4,6 +4,30 @@
 		"selected_items":
 		[
 			[
+				"first",
+				"firstTip"
+			],
+			[
+				"processe",
+				"processedLinks"
+			],
+			[
+				"out",
+				"outsidePortals"
+			],
+			[
+				"contai",
+				"containsAllLinks"
+			],
+			[
+				"crosses",
+				"crossesForPortal2"
+			],
+			[
+				"cross",
+				"crossesForPortal1"
+			],
+			[
 				"field",
 				"field"
 			],
@@ -55,7 +79,7 @@
 			"file": "main.lua",
 			"settings":
 			{
-				"buffer_size": 14292,
+				"buffer_size": 26229,
 				"line_ending": "Windows"
 			}
 		}
@@ -84,10 +108,10 @@
 	},
 	"file_history":
 	[
+		"/C/Users/James Lind/Downloads/Desktop/Love2d Projects/JLib/JLib.lua",
 		"/C/Users/James Lind/Downloads/Desktop/Love2d Projects/IFP/main.lua",
 		"/C/Users/James Lind/AppData/Roaming/Sublime Text 2/Packages/User/Default (Windows).sublime-keymap",
 		"/C/Users/James Lind/AppData/Roaming/Sublime Text 2/Packages/Default/Default (Windows).sublime-keymap",
-		"/C/Users/James Lind/Downloads/Desktop/Love2d Projects/JLib/JLib.lua",
 		"/C/Users/James Lind/Downloads/Desktop/Love2d Projects/IFP/conf.lua",
 		"/C/Users/James Lind/AppData/Roaming/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
 		"/C/Users/James Lind/AppData/Roaming/Sublime Text 2/Packages/User/Preferences.sublime-settings",
@@ -112,6 +136,17 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"field.links",
+			"fieldOrder",
+			"field",
+			"isIntable",
+			"isintable",
+			"ends",
+			"link.ends[2]",
+			"link.ends[1]",
+			"link.ends[1]}",
+			"crossesForPortal2",
+			"crossesForPortal1",
 			"currentField",
 			"CurrentField",
 			"currentField",
@@ -181,15 +216,15 @@
 					"file": "main.lua",
 					"settings":
 					{
-						"buffer_size": 14292,
+						"buffer_size": 26229,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								12551,
-								12551
+								21308,
+								21308
 							]
 						],
 						"settings":
@@ -198,7 +233,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 252.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
