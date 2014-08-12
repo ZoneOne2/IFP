@@ -79,7 +79,7 @@
 			"file": "main.lua",
 			"settings":
 			{
-				"buffer_size": 26229,
+				"buffer_size": 19136,
 				"line_ending": "Windows"
 			}
 		}
@@ -216,15 +216,15 @@
 					"file": "main.lua",
 					"settings":
 					{
-						"buffer_size": 26229,
+						"buffer_size": 19136,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								21308,
-								21308
+								13285,
+								13285
 							]
 						],
 						"settings":
@@ -233,7 +233,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 252.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

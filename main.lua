@@ -1,10 +1,5 @@
 function love.load()
-	--[[TODO:
-	
-		--ADD PARENT FIELD TO EACH FIELD
-		--ADD isParent trait to Field object
 
-		]]
 	exit=false
 	require "JLib"
 	
@@ -155,6 +150,7 @@ function love.draw()
 		drawGrid(100)
 		lg.circle("fill",0,0,4)
 
+
 		if (mode == "place") then
 
 			setHexColor(white)
@@ -173,30 +169,6 @@ function love.draw()
 			 end
 		 end
 
-		if (mode == "mainAnchor") then
-
-			setHexColor(white)
-			for i, portal in pairs(portals) do
-
-				if(portal == closestPortal and not portal.isAnchor) then
-
-					setHexColor(red)
-					lg.circle("fill",portal.x,portal.y,4)
-
-				 end
-
-				if (portal.isAnchor) then
-					setHexColor(cerulean)
-				 else
-					setHexColor(white)
-				 end
-				lg.circle("fill",portal.x,portal.y,3)
-
-			 end
-
-
-		 end
-
 		if (mode == "anchors") then
 
 			setHexColor(white)
@@ -206,7 +178,6 @@ function love.draw()
 
 			 end
 
-			--pointPolygon("line",outsidePortals)
 
 			setHexColor(red)
 
@@ -224,7 +195,6 @@ function love.draw()
 			for i, link in pairs(links) do
 
 				setHexColor(white)
-				--lg.setLineWidth(3)
 
 				pointLine(link.ends)
 
@@ -253,7 +223,6 @@ function love.draw()
 
 			 end
 
-			--pointPolygon("line",outsidePortals)
 
 			for i, field in pairs(fields) do
 
@@ -265,7 +234,6 @@ function love.draw()
 			for i, link in pairs(links) do
 
 				setHexColor(white)
-				--lg.setLineWidth(3)
 
 				pointLine(link.ends)
 
@@ -280,59 +248,7 @@ function love.draw()
 
 
 		 end
-
-		if (mode == "secondaryAnchor") then
-
-			setHexColor(white)
-			for i, portal in pairs(portals) do
-
-				if(portal == closestPortal and #portal.inFields == 0 and not portal.isAnchor) then
-
-					setHexColor(red)
-					lg.circle("fill",portal.x,portal.y,4)
-
-				 end
-
-				if (portal.isAnchor) then
-					setHexColor(cerulean)
-				 elseif (#portal.inFields ~= 0) then
-				 	setHexColor(cerulean)
-				 else
-					setHexColor(white)
-				 end
-				lg.circle("fill",portal.x,portal.y,3)
-
-			 end
-
-			for i, field in pairs(fields) do
-
-				lg.setColor(HEXtoDEC("00"),HEXtoDEC("7b"),HEXtoDEC("a7"),255)
-				pointPolygon("line",field.anchorPortals)
-
-			 end
-
-			setHexColor(red)
-
-			for i, link in pairs(possibleLinks) do
-				pointLine({link.ends[1],link.ends[2]})
-			end
-
-			for i, link in pairs(links) do
-
-				setHexColor(white)
-				--lg.setLineWidth(3)
-
-				lg.push()
-				lg.translate( unpack(findMid( link.ends[1] , link.ends[2] )) )
-				lg.scale(1,-1)
-					lg.print( link.id, 0,0 )
-				lg.pop()
-
-			 end
-
-
-		 end
-
+		
 		if (mode == "field") then
 
 			setHexColor(white)
@@ -460,9 +376,7 @@ function love.draw()
 
 			 end
 
-
-
-		end
+		 end
 
 		
 		drawButtons()
@@ -472,58 +386,14 @@ function love.draw()
  end
 
 function love.update(dt)
+	
 	jupdate(dt)
-	if(closestPortal) then
-		--print(closestPortal.id)
-	end
 	
 	if #portals >0 then
 		closestPortalID = findClosestPoint(mouse,portals)
 		closestPortal = closestPortalID[1][closestPortalID[2]]
 		currentField = closestPortal.inFields[#closestPortal.inFields]
-		--print(closestPortal.tipAccess,closestPortal.anchorLevel)
 	end
-
-	if (mode == "secondaryAnchor") then
-		
-		possibleLinks = {}
-		
-		if (not closestPortal.isAnchor and #closestPortal.inFields == 0) then
-
-
-			for i, link in pairs(links) do
-
-				local crossesForEnd1 = false
-				local crossesForEnd2 = false
-
-				for j, linkCrossCheck in pairs(links) do
-
-					if (link ~= linkCrossCheck) then
-
-						local int1,intP1 = findIntersect({{x=closestPortal.x,y=closestPortal.y},link.ends[1]},linkCrossCheck.ends,false)
-						local int2,intP2 = findIntersect({{x=closestPortal.x,y=closestPortal.y},link.ends[2]},linkCrossCheck.ends,false)
-
-						if ( int1 and (intP1.x ~= link.ends[1].x) and (intP1.y ~= link.ends[1].y) ) then
-							crossesForEnd1 = true
-						end
-
-						if (int2 and (intP2.x ~= link.ends[2].x) and (intP2.y ~= link.ends[2].y) ) then
-							crossesForEnd2 = true
-						end
-						
-					 end
-
-				 end
-
-				if (not crossesForEnd1 and not crossesForEnd2) then
-					table.insert(possibleLinks,link) 
-				 end
-
-			 end
-
-		 end
-
-	 end
 
 	if (mode == "link" and not isCompleted(fieldOrder[#fieldOrder])) then
 		for i, field in pairs(fieldOrder) do
@@ -535,7 +405,6 @@ function love.update(dt)
 
 	 end
 
-	--print(mode)
 	
  end
 
@@ -560,13 +429,6 @@ function love.keypressed( key, unicode )
 			mode = "anchorLinks"
 			--print("Select 3 main outside portals")
 		end
-
-	end
-
-
-	if (mode == "mainAnchor") then
-
-		--
 
 	end
 
@@ -717,217 +579,6 @@ function love.mousepressed( x, y, button )
 
 	 end
 
-	if (mode == "mainAnchor") then
-
-		if button == "l" then
-			
-			if (not closestPortal.isAnchor) then
-
-				closestPortal.isAnchor = true
-				closestPortal.anchorLevel = 1
-
-				if (totalAnchors == 0) then
-					closestPortal.tipAccess = true
-				else
-					closestPortal.tipAccess = false
-				end
-
-				totalAnchors = totalAnchors+1
-
-				if (totalAnchors == 3) then
-
-					table.insert(fields,Field:new{level = 1, fieldType = "main"})
-
-					for i, portal in pairs(portals) do
-
-						if (portal.isAnchor) then
-
-							table.insert(fields[1].anchorPortals,portal)
-							
-						 end
-
-					 end
-
-					fields[1]:setPortalsInside()
-
-					table.insert(links,Link:new{level = 1, ends = {fields[1].anchorPortals[1],fields[1].anchorPortals[2]} })
-					table.insert(links,Link:new{level = 1, ends = {fields[1].anchorPortals[2],fields[1].anchorPortals[3]} })
-					table.insert(links,Link:new{level = 1, ends = {fields[1].anchorPortals[1],fields[1].anchorPortals[3]} })
-
-					mode = "secondaryAnchor"
-				 
-				 end
-
-
-			 end
-
-		 end
-
-		if button == "r" then
-			
-		 end
-
-		if button == "m" then
-			
-		 end
-
-	 end
-
-	--[[if (mode == "secondaryAnchor") then
-
-		if button == "l" then
-			
-			local allPortalsInsideAnchors = true
-
-
-
-			if (#possibleLinks == 1) then
-
-
-
-			elseif (#possibleLinks == 3) then
-
-				local foundField = false
-				local fieldID = 0
-				local portalID = 0
-
-				for i, field in pairs(fields) do
-
-					if (not foundField) then
-					
-						local containsAllLinks = true
-
-						for j, link in pairs(possibleLinks) do
-
-							if ((not isInTable(link.ends[1],field.anchorPortals) or (not isInTable(link.ends[2],field.anchorPortals)) then
-
-								containsAllLinks = false
-
-							 end
-
-						 end
-
-						if (containsAllLinks) then
-
-							foundField = true
-							fieldID = i
-
-						 end
-
-					 end
-
-				 end
-
-
-				for i, portal in paris(fields[fieldID].anchorPortals) do
-
-					if (portal.tipAccess) then
-
-						portalID = portal.id
-
-					 end
-
-				 end
-
-				portals[portalID].tipAccess = false
-				portals[portalID].isAnchor = false
-				
-
-
-
-
-			 end
-
-
-
-
-
-
-
-
-
-
-
-
-			for i, portal in pairs(portals) do
-
-			 	if (not portal.isAnchor) then
-
-			 		if (#portal.inFields == 0) then
-
-			 			allPortalsInsideAnchors = false
-
-			 		 end
-
-			 	 end
-
-			 end
-
-
-			if (allPortalsInsideAnchors) then
-
-				mode = "field"
-
-			end 
-
-		 end
-
-		if button == "r" then
-			
-			possibleLinks = {}
-			
-			if (not closestPortal.isAnchor and #closestPortal.inFields == 0) then
-
-
-				for i, link in pairs(links) do
-
-					local crossesForEnd1 = false
-					local crossesForEnd2 = false
-
-					for j, linkCrossCheck in pairs(links) do
-
-						if (link ~= linkCrossCheck) then
-
-							local int1,intP1 = findIntersect({{x=closestPortal.x,y=closestPortal.y},link.ends[1]},linkCrossCheck.ends,false)
-							local int2,intP2 = findIntersect({{x=closestPortal.x,y=closestPortal.y},link.ends[2]},linkCrossCheck.ends,false)
-
-							if ( int1 ) then
-								crossesForEnd1 = true
-							end
-
-							if ( int2 ) then
-								crossesForEnd2 = true
-							end
-
-							print("link"..i.." - crosses link"..j.." on way to end1: ",crossesForEnd1)
-								print("\tEnd1 at: "..link.ends[1].x,link.ends[1].y)
-								print("\tXros at: "..intP1.x,intP1.y)
-							print("link"..i.." - crosses link"..j.." on way to end2: ",crossesForEnd1)
-								print("\tEnd2 at: "..link.ends[2].x,link.ends[2].y)
-								print("\tXros at: "..intP2.x,intP2.y)
-							
-						 end
-
-					 end
-
-					if (not crossesForEnd1 and not crossesForEnd2) then
-						table.insert(possibleLinks,link) 
-					 end
-
-				 end
-
-			 end
-
-
-
-		 end
-
-		if button == "m" then
-			
-		 end
-
-	 end]]
-
 	if (mode == "field") then
 
 		if button == "l" then
@@ -939,40 +590,8 @@ function love.mousepressed( x, y, button )
 				closestPortal.tipAccess = true
 				totalAnchors = totalAnchors+1
 
-			--[[
-				--determine which anchor portal is "tip" for assigning field types of wing/tail
-				local possibleTipPortals = {}
-
-				for i, portal in pairs(currentField.anchorPortals) do
-
-					if (portal.tipAccess) then
-
-						possibleTipPortals[i] = portal.anchorLevel
-
-					 end
-
-				 end
-
-				local limit, key
-				if(currentField.fieldType == "tail") then
-					limit, key = tableMax(possibleTipPortals)
-				else
-					limit, key = tableMin(possibleTipPortals)
-				end
-
-				
-				local tipPortal = key
 				local sidePortals = {}
 
-				for i, portal in pairs(currentField.anchorPortals) do
-					if (i ~= key) then
-						table.insert(sidePortals,i)
-					end
-				 end
-				--
-			]]
-				local sidePortals = {}
-				--local tipPortal = currentField.tipPortal
 				for i, portal in pairs(currentField.anchorPortals) do
 					if (currentField.tipPortal ~= portal) then
 						table.insert(sidePortals,portal)

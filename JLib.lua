@@ -12,9 +12,12 @@ function init()
 	window.width = lg.getWidth()
 	window.height = lg.getHeight()
 
+	userInput = {}
+
 	nameColors()
 	
 	setButtons()
+
 
  end
 
@@ -247,7 +250,7 @@ function findIntersect(L1,L2,ends)
 
 
 		if ( (xInt > x1) and (xInt < x2) and (xInt > x3) and (xInt < x4) ) then
-			print((xInt>x1),"xint",xInt,"x1,x2",x1,x2,"x3,x4",x3,x4)
+		--	print((xInt>x1),"xint",xInt,"x1,x2",x1,x2,"x3,x4",x3,x4)
 			return true, intercept
 
 		else
@@ -1193,6 +1196,47 @@ function distToLine(refPoint,line)
 	return b*math.sin(alpha)
 
  end
+
+
+
+function textInput(name,x,y)
+	love.keyboard.setTextInput(true)
+	prevMode = mode
+	activeText = name
+	mode = "text"
+
+	userInput[activeText] = ""
+	textX = x
+	textY = y
+
+
+ end
+
+
+
+
+function drawText(text,x,y)
+
+	lg.push()
+	lg.translate(x,y)
+	lg.scale(1,-1)
+		lg.print(text,0,0)
+	lg.pop()
+
+ end
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 --
