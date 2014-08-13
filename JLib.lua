@@ -18,14 +18,28 @@ function init()
 	
 	setButtons()
 
+	zoomLevel = 1
+	zoomOffsetX = 0
+	zoomOffsetY = 0
+
 
  end
 
 function jupdate(dt)
 
 	fps = math.floor(1/dt)
-	mx = love.mouse.getX()-(window.width/2)
-	my = -love.mouse.getY()+(window.height/2)
+
+	updateCursor()
+
+ end
+
+function updateCursor()
+
+	mxw = love.mouse.getX()-(window.width/2)
+	myw = -love.mouse.getY()+(window.height/2)
+
+	mx = (mxw-zoomOffsetX)/zoomLevel
+	my = (myw-zoomOffsetY)/zoomLevel
 
 	mouse = {x=mx, y=my}
 
@@ -1228,7 +1242,24 @@ function drawText(text,x,y)
 
 
 
+function zoom(increment)
 
+
+	local mxBeforeZoom = mx
+	local myBeforeZoom = my
+
+	zoomLevel = zoomLevel*increment
+
+	updateCursor()
+	
+	local mxAfterZoom = mx
+	local myAfterZoom = my
+
+	zoomOffsetX = zoomOffsetX + (mxAfterZoom-mxBeforeZoom)*zoomLevel
+	zoomOffsetY = zoomOffsetY + (myAfterZoom-myBeforeZoom)*zoomLevel
+
+
+ end
 
 
 

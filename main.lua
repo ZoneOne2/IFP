@@ -5,6 +5,8 @@ function love.load()
 	
 	init()
 
+	zoomLevel = 1
+
 	--definition of Portal object
 	Portal = {
 
@@ -146,6 +148,9 @@ function love.draw()
 		lg.translate(window.width/2,-window.height/2)
 		lg.setLineJoin("none")
 		lg.setLineWidth(1)
+
+		lg.translate(zoomOffsetX,zoomOffsetY)
+		lg.scale(zoomLevel)
 
 		drawGrid(100)
 		lg.circle("fill",0,0,4)
@@ -465,6 +470,21 @@ function love.keyreleased( key, unicode )
  end
 
 function love.mousepressed( x, y, button )
+
+	if (button == "wu") then
+
+		zoom(1.5)
+
+	 end
+
+	if (button == "wd") then
+
+		zoom(1/1.5)
+
+	 end
+
+
+
 
 	if (mode == "place") then
 
