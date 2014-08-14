@@ -7,6 +7,11 @@ function love.load()
 
 	zoomLevel = 1
 
+	map = love.graphics.newImage("map.png")
+	mapWidth = map:getWidth()
+	mapHeight = map:getHeight()
+
+
 	--definition of Portal object
 	Portal = {
 
@@ -152,8 +157,14 @@ function love.draw()
 		lg.translate(zoomOffsetX,zoomOffsetY)
 		lg.scale(zoomLevel)
 
-		drawGrid(100)
-		lg.circle("fill",0,0,4)
+		--drawGrid(100)
+		--lg.circle("fill",0,0,4)
+
+		lg.push()
+			lg.scale(1,-1)
+			lg.draw(map,-mapWidth/2,-mapHeight/2)
+		lg.pop()
+
 
 
 		if (mode == "place") then
@@ -473,13 +484,13 @@ function love.mousepressed( x, y, button )
 
 	if (button == "wu") then
 
-		zoom(1.5)
+		zoom(1.1)
 
 	 end
 
 	if (button == "wd") then
 
-		zoom(1/1.5)
+		zoom(1/1.1)
 
 	 end
 
