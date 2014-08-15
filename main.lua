@@ -23,6 +23,7 @@ function love.load()
 		anchorLevel = 0,
 		tipAccess = false,
 		inLinks={},
+		name = "",
 
 	 }
 	function Portal:new(o)
@@ -177,12 +178,28 @@ function love.draw()
 					setHexColor(red)
 					lg.circle("fill",portal.x,portal.y,4)
 
+					if (not hasTextInput) then
+						local textWidth = defaultFont:getWidth(portal.name)
+						local textHeight = defaultFont:getHeight(portal.name)
+						local drawX = portal.x+10
+						local drawY = portal.y+10
+
+						setHexColor(white)
+						lg.rectangle("fill",drawX-1,drawY+1,textWidth+2,-textHeight-2)
+						setHexColor(black)
+						lg.rectangle("line",drawX-1,drawY+1,textWidth+2,-textHeight-2)
+
+						setHexColor(cerulean)
+						drawText(portal.name,drawX,drawY)
+					end
+
 				 end
 
 				setHexColor(white)
 				lg.circle("fill",portal.x,portal.y,3)
 
 			 end
+
 		 end
 
 		if (mode == "anchors") then
@@ -394,6 +411,22 @@ function love.draw()
 
 		 end
 
+
+		if (hasTextInput) then
+
+			local textWidth = defaultFont:getWidth(userInput[activeText])
+			local textHeight = defaultFont:getHeight(userInput[activeText])
+
+			setHexColor(white)
+			lg.rectangle("fill",textX-1,textY+1,textWidth+2,-textHeight-2)
+			setHexColor(black)
+			lg.rectangle("line",textX-1,textY+1,textWidth+2,-textHeight-2)
+
+			setHexColor(cerulean)
+			drawText(userInput[activeText],textX,textY)
+
+	 	 end
+
 		
 		drawButtons()
 	
@@ -414,7 +447,7 @@ function love.update(dt)
 	if (mode == "link" and not isCompleted(fieldOrder[#fieldOrder])) then
 		for i, field in pairs(fieldOrder) do
 			print("makingLinks"..i)
-			love.timer.sleep(2)
+			--love.timer.sleep(2)
 			makeField(field)
 			print("field "..i.." is completed.")
 		end
@@ -428,51 +461,83 @@ function love.focus(bool)
 
  end
 
+function love.textinput(t)
+
+	userInput[activeText] = userInput[activeText]..t
+
+ end
+
 function love.keypressed( key, unicode )
 	
-	if key == "`" then
-		debug.debug()
-	end
-	
-	if (mode == "place") then
+	if (hasTextInput) then
 
-		if key == "/" then
-			testFunc()
+
+		if key == "backspace" then
+
+			userInput[activeText] = string.sub(userInput[activeText],1,-2)
+
+		 elseif (key == "kpenter") or (key == "return") then
+
+		 	if (string.sub(activeText,1,6)=="portal") then
+		 		portals[#portals].name = userInput[activeText]
+		 	end
+
+		 	love.keyboard.setTextInput(false)
+		 	hasTextInput = false
+		 	activeText = ""
+
+		 end
+	 
+
+	else
+
+
+		if key == "`" then
+			debug.debug()
 		end
+		
+		if (mode == "place") then
 
-		if key == "return" then
-			setAnchorPortals()
-			mode = "anchorLinks"
-			--print("Select 3 main outside portals")
-		end
+			if key == "/" then
+				testFunc()
+			end
 
-	end
+			if key == "return" then
+				setAnchorPortals()
+				mode = "anchorLinks"
+				--print("Select 3 main outside portals")
+			 end
 
-	if (mode == "field") then
+		 end
 
-		--
-
-	end
-
-	if (mode == "link") then
-
-		if key == "return" then
+		if (mode == "field") then
 
 			--
 
-		end
+		 end
 
-	end
+		if (mode == "link") then
 
-	if (mode == "temp") then
+			if key == "return" then
 
-		if key == "return" then
+				--
 
-			--
+			 end
 
-		end
+		 end
 
-	end
+		if (mode == "temp") then
+
+			if key == "return" then
+
+				--
+
+			 end
+
+		 end
+
+
+	 end
 
  end
 
@@ -501,7 +566,15 @@ function love.mousepressed( x, y, button )
 
 		if button == "l" then
 			table.insert(portals,Portal:new{x=mx,y=my})
+			textInput("portal"..portals[#portals].id,portals[#portals].x+10,portals[#portals].y+10)
 		 end
+
+		if button == "r" then
+			if (getKey(closestPortal,portals)~=nil) then
+				table.remove(portals,getKey(closestPortal,portals))
+				totalPortals = totalPortals - 1
+			end
+		end
 
 	 end
 
@@ -819,7 +892,7 @@ function makeField(field)
 		else
 
 			print("found nothing to do")
-			love.timer.sleep(1)
+			--love.timer.sleep(1)
 			exit = true
 
 	 	 end
@@ -868,8 +941,8 @@ function makeLink(link)
 	if (not link.isMade) then
 
 		link.isMade = true
-		print("made link "..link.id)
-
+		--print("made link "..link.id)
+		print(link.ends[1].name.." to "..link.ends[2].name)
 	 else
 
 		--print("re-made link that was already made ".."(link "..link.id..")")

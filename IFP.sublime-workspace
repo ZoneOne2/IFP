@@ -71,7 +71,7 @@
 			"file": "conf.lua",
 			"settings":
 			{
-				"buffer_size": 1567,
+				"buffer_size": 2739,
 				"line_ending": "Windows"
 			}
 		},
@@ -79,7 +79,7 @@
 			"file": "main.lua",
 			"settings":
 			{
-				"buffer_size": 19501,
+				"buffer_size": 21265,
 				"line_ending": "Windows"
 			}
 		}
@@ -108,8 +108,8 @@
 	},
 	"file_history":
 	[
-		"/C/Users/James Lind/Downloads/Desktop/Love2d Projects/JLib Template/main.lua",
 		"/C/Users/James Lind/Downloads/Desktop/Love2d Projects/JLib/JLib.lua",
+		"/C/Users/James Lind/Downloads/Desktop/Love2d Projects/JLib Template/main.lua",
 		"/C/Users/James Lind/Downloads/Desktop/Love2d Projects/IFP/main.lua",
 		"/C/Users/James Lind/AppData/Roaming/Sublime Text 2/Packages/User/Default (Windows).sublime-keymap",
 		"/C/Users/James Lind/AppData/Roaming/Sublime Text 2/Packages/Default/Default (Windows).sublime-keymap",
@@ -137,6 +137,18 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			")\n",
+			"load()\n\n	exit=false\n	require \"JLib\"\n	\n	init()\n\n	zoomLevel = 1\n\n	map = love.graphics.newImage(\"map.png\")\n	mapWidth = map:getWidth()\n	mapHeight = map:getHeight()\n\n\n	--definition of Portal object\n	Portal = {\n\n		id = 0,\n		x=0, y=0, \n		title=\"untitled portal\", \n		inFields={}, \n		isAnchor = false, \n		anchorLevel = 0,\n		tipAccess = false,\n		inLinks={},\n		name = \"\",\n\n	 }\n	function Portal:new(o)\n\n		totalPortals = totalPortals+1\n\n		o = o or {}\n		setmetatable(o, self)\n		self.__index = self\n		o.id = #portals+1\n		o.inFields = {}\n		o.inLinks = {}\n		return o\n\n	 end\n	totalAnchors = 0\n	totalPortals = 0\n\n	--definition of Field object\n	Field = {\n\n		id = 0,\n		anchorPortals = {}, \n		containsPortals = {}, \n		level = 0, \n		area = 0,\n		fieldType = \"unassigned\",\n		isParent = false,\n		tail = nil,\n		wing1 = nil,\n		wing2 = nil,\n		tailCompleted = false,\n		wing1Completed = false,\n		wing2Completed = false,\n		links = {},\n		tipPortal = nil,\n\n	 }\n	function Field:new(o)\n\n		totalFields = totalFields+1\n\n		o = o or {}\n		setmetatable(o,self)\n		self.__index = self\n		o.id = #fields+1\n		o.anchorPortals = {}\n		o.containsPortals = {}\n		o.links = {}\n		--o:setPortalsInside()\n		return o\n\n	 end\n	function Field:setPortalsInside()\n\n		for i, portal in pairs(portals) do\n\n			if(portal.anchorLevel ~= self.level) then\n\n				if (isInside(portal,self.anchorPortals)) then\n\n					table.insert(self.containsPortals,portal)\n					table.insert(portal.inFields,self)\n\n				 end\n\n			 end\n\n		 end\n\n	 end\n	totalFields = 0\n\n	--definition of Link object\n	Link = {\n\n		id = 0,\n		level = 0,\n		ends = {},\n		isMade = false,\n		mid = {},\n\n	 }\n	function Link:new(o)\n\n		totalLinks = totalLinks+1\n\n		o = o or {}\n		setmetatable(o,self)\n		self.__index = self\n		o.id = #links+1\n		objectTableSort(self.ends,\"id\")\n		o.mid = {x=findMid(o.ends[1],o.ends[2])[1], y=findMid(o.ends[1],o.ends[2])[2]}\n		table.insert(o.ends[1].inLinks,o)\n		table.insert(o.ends[2].inLinks,o)\n		return o\n\n	 end \n	totalLinks = 0\n	linksMade = 0\n\n	portals = {}\n	fields = {}\n	links = {}\n\n\n	mode = \"place\"\n	--fieldQueue = {}\n	--linkQueue = {}\n	--priorityField = nil\n\n	temp = 0\n\n	possibleLinks = {}\n	outsidePortals = {}\n\n	selectedAnchor = nil\n	anchorLinks = {}\n\n	fieldOrder = {}\n\n end",
+			"userInput[\"portal\"..portal.id]",
+			"portal.y",
+			"portal.x",
+			"textY",
+			"textX",
+			"hasTextInput",
+			"TextInput",
+			"textInput",
+			"sleep",
+			"pause",
 			"field.links",
 			"fieldOrder",
 			"field",
@@ -189,15 +201,15 @@
 					"file": "conf.lua",
 					"settings":
 					{
-						"buffer_size": 1567,
+						"buffer_size": 2739,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1191,
-								1191
+								0,
+								0
 							]
 						],
 						"settings":
@@ -217,15 +229,15 @@
 					"file": "main.lua",
 					"settings":
 					{
-						"buffer_size": 19501,
+						"buffer_size": 21265,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7657,
-								7657
+								16746,
+								16746
 							]
 						],
 						"settings":
@@ -234,7 +246,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 14.0,
+						"translation.y": 196.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

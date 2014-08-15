@@ -22,6 +22,9 @@ function init()
 	zoomOffsetX = 0
 	zoomOffsetY = 0
 
+	hasTextInput = false
+
+	mode = "none"
 
  end
 
@@ -1214,15 +1217,15 @@ function distToLine(refPoint,line)
 
 
 function textInput(name,x,y)
+
 	love.keyboard.setTextInput(true)
 	prevMode = mode
 	activeText = name
-	mode = "text"
+	hasTextInput = true
 
 	userInput[activeText] = ""
 	textX = x
 	textY = y
-
 
  end
 
@@ -1263,8 +1266,25 @@ function zoom(increment)
 
 
 
+--returns position (key) for a spicified value in a table.
+--If value exists more than once, only the first key will be returned.
+function getKey(val,table)
 
 
+	for i, value in pairs(table) do
+
+		if (value == val) then
+
+			return i
+
+		 end
+
+	 end
+
+	print("Value not found, no key given.")
+	return nil
+
+ end
 
 
 
